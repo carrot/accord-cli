@@ -1,0 +1,23 @@
+{
+  "name": "accord-cli",
+  "version": "0.0.0",
+  "author": "Jeff Escalante <jeff@carrotcreative.com>",
+  "description": "compile any language from the command line",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/carrot/accord-cli.git"
+  },
+  "main": "lib",
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "coffee-script": "1.7.x"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  }
+}
