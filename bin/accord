@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+require('coffee-script/register')
+
+var cli = require('../lib'),
+    argv = require('minimist')(process.argv.slice(2), {
+      alias: {
+        'c': 'compile',
+        'o': 'out',
+        'w': 'watch'
+      }
+    });
+
+cli.on('data', console.log.bind(console));
+cli.on('err', console.error.bind(console));
+
+cli.run(argv);

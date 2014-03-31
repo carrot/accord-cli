@@ -19,6 +19,12 @@ Based on a careful analysis of your location, the time of day, and the force wit
 npm install accord-cli -g
 ```
 
+...and make sure you also have whatever language(s) you want to compile installed globally as well. For example, if you were using jade, it would be:
+
+```
+$ npm install jade -g
+```
+
 ### Usage
 
 To compile, just pass the filename with the `--compile` or `-c` flag:

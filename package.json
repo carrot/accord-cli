@@ -9,15 +9,21 @@
     "url": "https://github.com/carrot/accord-cli.git"
   },
   "main": "lib",
-  "devDependencies": {
-    "mocha": "*",
-    "should": "*",
-    "coffee-script": "1.7.x"
-  },
   "scripts": {
     "test": "mocha"
   },
   "engines": {
     "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "coffee-script": "1.7.x",
+    "minimist": "0.0.8",
+    "lodash": "2.4.x",
+    "accord": "0.0.8",
+    "colors": "0.6.x"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
   }
 }
