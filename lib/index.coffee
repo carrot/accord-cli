@@ -1,4 +1,5 @@
 require 'colors'
+fs     = require 'fs'
 path   = require 'path'
 _      = require 'lodash'
 accord = require 'accord'
@@ -19,20 +20,26 @@ module.exports.run = (argv) ->
     a = new v
     if _.contains(a.extensions, ext) then name = a.name
 
-  # grab adapter name
-  # TODO: need handling for if the adapter isnt installed
-  adapter = accord.load(name)
+  if not name then return cli.emit('err', "File extension '#{ext}' not supported".red)
+
+  # grab adapter
+  adapter = accord.load(name, resolve_path(name))
 
   # render the file
   try
-    adapter.renderFile(filepath, locals)
-      .then(console.log.bind(console))
-      # TODO: need handling for writing to a path
+    promise = adapter.renderFile(filepath, locals)
   catch err
     if err.code == 'ENOENT'
       cli.emit('err', "File '#{filepath}' not found ".red)
     else
       cli.emit('err', err)
+    return cli
+
+  # now decide how to render the output
+  if argv.out
+    promise.then((o) -> fs.writeFileSync(path.resolve(argv.out), o))
+  else
+    promise.then(console.log.bind(console))
 
   return cli
 
@@ -47,3 +54,10 @@ get_locals = (argv) ->
   delete res.watch
   delete res.w
   return res
+
+# can be found in accord's source
+resolve_path = (name) ->
+  _path = require.resolve(name).split(path.sep).reverse()
+  for p, i in _path
+    if _path[i - 1] is name and p is 'node_modules' then break
+  _.first(_path.reverse(), _path.length - i + 1).join(path.sep)
