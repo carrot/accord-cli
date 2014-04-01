@@ -37,9 +37,11 @@ module.exports.run = (argv) ->
 
   # now decide how to render the output
   if argv.out
-    promise.then((o) -> fs.writeFileSync(path.resolve(argv.out), o))
+    promise
+      .then((o) -> fs.writeFileSync(path.resolve(argv.out), o))
+      .then(cli.emit.bind(cli, 'done'))
   else
-    promise.then(console.log.bind(console))
+    promise.then(cli.emit.bind(cli, 'data'))
 
   return cli
 
