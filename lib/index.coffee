@@ -1,51 +1,64 @@
 require 'colors'
-fs     = require 'fs'
-path   = require 'path'
-_      = require 'lodash'
-accord = require 'accord'
-
-# return an event emitter
+fs           = require 'fs'
+path         = require 'path'
+_            = require 'lodash'
+accord       = require 'accord'
 EventEmitter = require('events').EventEmitter
-cli = new EventEmitter
-module.exports = cli
 
-# run the actual command
+module.exports = cli = new EventEmitter
+
+###*
+ * The main export has to be the event emitter to be able to correctly
+ * attach events before run. This function actually runs the cli logic,
+ * given an arguments object.
+ *
+ * First, we get some information we'll need - the locals passed in, the
+ * path to the file being compiled, the file's extension, and the adapter
+ * being used to compile it.
+ *
+ * Then we handle common errors - if the file type isn't supported by accord
+ * or if the actual file passed in was not found.
+ *
+ * After this, we grab the adapter and try to compile the file. If there
+ * was a compile error, that's emitted. If not, we either write or log the
+ * results.
+ * 
+ * @param  {Object} argv - command line arguments, parsed by minimist
+ * @return {EventEmitter} returns cli for chaining
+###
+
 module.exports.run = (argv) ->
   locals = get_locals(argv)
   filepath = path.resolve(argv.compile)
   ext = path.extname(filepath).substring(1)
+  name = lookup_adapter(ext)
 
-  # adapter lookup
-  for k, v of accord.all()
-    a = new v
-    if _.contains(a.extensions, ext) then name = a.name
+  if not name
+    return cli.emit('err', "File extension '#{ext}' not supported".red)
+  
+  if not fs.existsSync(filepath)
+    return cli.emit('err', "File '#{filepath}' not found ".red)
 
-  if not name then return cli.emit('err', "File extension '#{ext}' not supported".red)
-
-  # grab adapter
   adapter = accord.load(name, resolve_path(name))
 
-  # render the file
-  try
-    promise = adapter.renderFile(filepath, locals)
-  catch err
-    if err.code == 'ENOENT'
-      cli.emit('err', "File '#{filepath}' not found ".red)
-    else
-      cli.emit('err', err)
-    return cli
-
-  # now decide how to render the output
-  if argv.out
-    promise
-      .then((o) -> fs.writeFileSync(path.resolve(argv.out), o))
-      .then(cli.emit.bind(cli, 'done'))
-  else
-    promise.then(cli.emit.bind(cli, 'data'))
+  adapter.renderFile(filepath, locals)
+    .catch(cli.emit.bind(cli, 'err'))
+    .then((o) ->
+      if argv.out
+        fs.writeFileSync(path.resolve(argv.out), o)
+      else
+        cli.emit('data', o)
+    )
+    .then(cli.emit.bind(cli, 'done'))
 
   return cli
 
-# remove the functional flags, leaving only the locals
+###*
+ * Remove the functional flags, leaving only the 'locals'.
+ * @param  {Object} argv - args object, parsed my minimist
+ * @return {Object} cloned object, pruned of all functional keys
+###
+
 get_locals = (argv) ->
   res = _.clone(argv)
   delete res._
@@ -57,7 +70,27 @@ get_locals = (argv) ->
   delete res.w
   return res
 
-# can be found in accord's source
+###*
+ * Given a file extension, finds the adapter's name in accord, or
+ * returns undefined.
+ * 
+ * @param  {String} ext - file extension, no dot
+ * @return {?} string adapter name or undefined
+###
+
+lookup_adapter = (ext) ->
+  for name, Adapter of accord.all()
+    a = new Adapter
+    if _.contains(a.extensions, ext) then return a.name
+  return
+
+###*
+ * Given the name of a module, returns it's home folder in node
+ * modules. This was taken from accord's source.
+ * @param  {String} name - name of a node module
+ * @return {String} path to the module
+###
+
 resolve_path = (name) ->
   _path = require.resolve(name).split(path.sep).reverse()
   for p, i in _path
