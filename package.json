@@ -9,6 +9,9 @@
     "url": "https://github.com/carrot/accord-cli.git"
   },
   "main": "lib",
+  "bin": {
+    "accord": "./bin/accord"
+  },
   "scripts": {
     "test": "mocha",
     "coveralls": "make build; istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage; make unbuild"
