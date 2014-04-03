@@ -5,6 +5,7 @@ _            = require 'lodash'
 accord       = require 'accord'
 EventEmitter = require('events').EventEmitter
 chokidar     = require 'chokidar'
+help         = require './help'
 
 module.exports = cli = new EventEmitter
 
@@ -29,6 +30,8 @@ module.exports = cli = new EventEmitter
 ###
 
 module.exports.run = (argv) ->
+  if not argv.compile or argv.help then return cli.emit('data', help())
+
   locals = get_locals(argv)
   filepath = path.resolve(argv.compile)
   ext = path.extname(filepath).substring(1)
@@ -115,4 +118,6 @@ get_locals = (argv) ->
   delete res.o
   delete res.watch
   delete res.w
+  delete res.help
+  delete res.h
   return res

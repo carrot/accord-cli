@@ -42,3 +42,10 @@ describe 'basic', ->
     cli.on('data', listener)
 
     watcher = cli.run(compile: @file, foo: 'bar', watch: true)
+
+  it 'should display help when no commands given', (done) ->
+    cli.once 'data', (data) ->
+      data.should.match /Accord CLI/
+      done()
+
+    cli.run({})

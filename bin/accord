@@ -7,7 +7,8 @@ var cli = require('../lib'),
       alias: {
         'c': 'compile',
         'o': 'out',
-        'w': 'watch'
+        'w': 'watch',
+        'h': 'help'
       }
     });
 
