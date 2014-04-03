@@ -1,7 +1,7 @@
 Accord CLI
 ==========
 
-[![npm](https://badge.fury.io/js/accord-cli.png)](http://badge.fury.io/js/accord-cli)  [![dependencies](https://david-dm.org/carrot/accord-cli.png?theme=shields.io)](https://david-dm.org/carrot/accord-cli) [![tests](https://travis-ci.org/carrot/accord-cli.png?branch=master)](https://travis-ci.org/carrot/accord-cli)
+[![npm](https://badge.fury.io/js/accord-cli.png)](http://badge.fury.io/js/accord-cli)  [![dependencies](https://david-dm.org/carrot/accord-cli.png?theme=shields.io)](https://david-dm.org/carrot/accord-cli) [![tests](https://travis-ci.org/carrot/accord-cli.png?branch=master)](https://travis-ci.org/carrot/accord-cli) [![Coverage Status](https://coveralls.io/repos/carrot/accord-cli/badge.png)](https://coveralls.io/r/carrot/accord-cli)
 
 Compile any language from the command line
 
