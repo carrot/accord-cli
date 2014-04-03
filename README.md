@@ -51,7 +51,7 @@ To watch a file, recompiling it any time it changes, use the `--watch` or `-w` f
 $ accord -w foo.jade
 ```
 
-And if you want to compile multiple files with potentially different extensions like you would for a full web build, just use [roots](http://roots.cx) ya dumbo! For all usage options, just run `accord` or `accord help`
+And if you want to compile multiple files with potentially different extensions like you would for a full web build, just use [roots](http://roots.cx) ya dumbo! For all usage options, just run `accord` or `accord --help`
 
 ### License & Contributing
 
