@@ -6,20 +6,39 @@ _path  = path.join(__dirname, 'fixtures')
 
 describe 'basic', ->
 
+  before ->
+    @file = path.join(_path, 'basic/wow.jade')
+    @out = path.join(_path, 'basic/wow.html')
+
   it 'basic compile should work', (done) ->
-    cli.on 'data', (out) ->
+    cli.once 'data', (out) ->
       out.should.eql('<p>bar</p>')
       done()
 
-    cli.run(compile: path.join(_path, 'basic/wow.jade'), foo: 'bar')
+    cli.run(compile: @file, foo: 'bar')
 
   it 'should write to given file path', (done) ->
-    _in = path.join(_path, 'basic/wow.jade')
-    _out = path.join(_path, 'basic/wow.html')
 
-    cli.on 'done', (out) ->
-      fs.existsSync(_out).should.be.ok
-      fs.unlinkSync(_out)
+    cli.run(compile: @file, foo: 'bar', out: @out).then =>
+      fs.existsSync(@out).should.be.ok
+      fs.unlinkSync(@out)
       done()
 
-    cli.run(compile: _in, foo: 'bar', out: _out)
+  it 'should watch a file for changes', (done) ->
+    i = 0
+
+    listener = (out) =>
+      i++
+      if i == 1
+        out.should.eql('<p>bar</p>')
+        setTimeout((=> fs.writeFileSync(@file, "p foo")), 100) 
+      if i == 2
+        out.should.eql('<p>foo</p>')
+        watcher.close()
+        fs.writeFileSync(@file, "p bar")
+        cli.removeListener('data', listener)
+        done()
+
+    cli.on('data', listener)
+
+    watcher = cli.run(compile: @file, foo: 'bar', watch: true)

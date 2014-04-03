@@ -43,12 +43,14 @@ module.exports.run = (argv) ->
   adapter = accord.load(name, resolve_path(name))
 
   run = -> render(adapter, filepath, locals, cli, argv)
+  promise = run()
 
   if argv.watch
     watcher = chokidar.watch(filepath, { persistent:  true })
-    watcher.on('change', -> run)
-  
-  run()
+    watcher.on('change', run)
+    watcher
+  else
+    promise
 
 ###*
  * Given a file extension, finds the adapter's name in accord, or
