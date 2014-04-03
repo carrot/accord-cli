@@ -1,6 +1,6 @@
 {
   "name": "accord-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Jeff Escalante <jeff@carrotcreative.com>",
   "description": "compile any language from the command line",
   "license": "MIT",
