@@ -11,6 +11,14 @@ var cli = require('../lib'),
       }
     });
 
+cli.on('start', function(){
+  if (argv.out) { process.stdout.write('compiling... '.grey) }
+});
+
+cli.on('done', function(){
+  if (argv.out) { console.log('done!'.green) }
+});
+
 cli.on('data', console.log.bind(console));
 cli.on('err', console.error.bind(console));
 

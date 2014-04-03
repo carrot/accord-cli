@@ -21,6 +21,7 @@
     "lodash": "2.4.x",
     "accord": "0.0.8",
     "colors": "0.6.x",
+    "chokidar": "0.8.x",
     "swig": "*",
     "jade": "*",
     "ejs": "*",

@@ -4,6 +4,7 @@ path         = require 'path'
 _            = require 'lodash'
 accord       = require 'accord'
 EventEmitter = require('events').EventEmitter
+chokidar     = require 'chokidar'
 
 module.exports = cli = new EventEmitter
 
@@ -24,7 +25,7 @@ module.exports = cli = new EventEmitter
  * results.
  * 
  * @param  {Object} argv - command line arguments, parsed by minimist
- * @return {EventEmitter} returns cli for chaining
+ * @return {Promise} promise for results
 ###
 
 module.exports.run = (argv) ->
@@ -41,34 +42,13 @@ module.exports.run = (argv) ->
 
   adapter = accord.load(name, resolve_path(name))
 
-  adapter.renderFile(filepath, locals)
-    .catch(cli.emit.bind(cli, 'err'))
-    .then((o) ->
-      if argv.out
-        fs.writeFileSync(path.resolve(argv.out), o)
-      else
-        cli.emit('data', o)
-    )
-    .then(cli.emit.bind(cli, 'done'))
+  run = -> render(adapter, filepath, locals, cli, argv)
 
-  return cli
-
-###*
- * Remove the functional flags, leaving only the 'locals'.
- * @param  {Object} argv - args object, parsed my minimist
- * @return {Object} cloned object, pruned of all functional keys
-###
-
-get_locals = (argv) ->
-  res = _.clone(argv)
-  delete res._
-  delete res.compile
-  delete res.c
-  delete res.out
-  delete res.o
-  delete res.watch
-  delete res.w
-  return res
+  if argv.watch
+    watcher = chokidar.watch(filepath, { persistent:  true })
+    watcher.on('change', -> run)
+  
+  run()
 
 ###*
  * Given a file extension, finds the adapter's name in accord, or
@@ -96,3 +76,41 @@ resolve_path = (name) ->
   for p, i in _path
     if _path[i - 1] is name and p is 'node_modules' then break
   _.first(_path.reverse(), _path.length - i + 1).join(path.sep)
+
+###*
+ * Compile and render the file
+ * @param  {String} filepath - path to the file
+ * @param  {EventEmitter} cli - cli emitter
+ * @param  {Object} argv - arguments object
+ * @return {Promise} a promise for the result
+###
+
+render = (adapter, filepath, locals, cli, argv) ->
+  cli.emit('start')
+
+  adapter.renderFile(filepath, locals)
+    .catch(cli.emit.bind(cli, 'err'))
+    .then((o) ->
+      if argv.out
+        fs.writeFileSync(path.resolve(argv.out), o)
+      else
+        cli.emit('data', o)
+    )
+    .then(cli.emit.bind(cli, 'done'))
+
+###*
+ * Remove the functional flags, leaving only the 'locals'.
+ * @param  {Object} argv - args object, parsed my minimist
+ * @return {Object} cloned object, pruned of all functional keys
+###
+
+get_locals = (argv) ->
+  res = _.clone(argv)
+  delete res._
+  delete res.compile
+  delete res.c
+  delete res.out
+  delete res.o
+  delete res.watch
+  delete res.w
+  return res
