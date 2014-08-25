@@ -24,7 +24,7 @@ module.exports = cli = new EventEmitter
  * After this, we grab the adapter and try to compile the file. If there
  * was a compile error, that's emitted. If not, we either write or log the
  * results.
- * 
+ *
  * @param  {Object} argv - command line arguments, parsed by minimist
  * @return {Promise} promise for results
 ###
@@ -39,7 +39,7 @@ module.exports.run = (argv) ->
 
   if not name
     return cli.emit('err', "File extension '#{ext}' not supported".red)
-  
+
   if not fs.existsSync(filepath)
     return cli.emit('err', "File '#{filepath}' not found ".red)
 
@@ -58,7 +58,7 @@ module.exports.run = (argv) ->
 ###*
  * Given a file extension, finds the adapter's name in accord, or
  * returns undefined.
- * 
+ *
  * @param  {String} ext - file extension, no dot
  * @return {?} string adapter name or undefined
 ###

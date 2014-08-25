@@ -31,7 +31,7 @@ describe 'basic', ->
       i++
       if i == 1
         out.should.eql('<p>bar</p>')
-        setTimeout((=> fs.writeFileSync(@file, "p foo")), 100) 
+        setTimeout((=> fs.writeFileSync(@file, "p foo")), 100)
       if i == 2
         out.should.eql('<p>foo</p>')
         watcher.close()
