@@ -58,12 +58,11 @@ module.exports.run = (argv) ->
  * Given a file extension, finds the adapter's name in accord, or
  * returns undefined.
  * @param  {String} ext - file extension, no dot
- * @return {?} string adapter name or undefined
+ * @return {String|undefined} string adapter name or undefined
 ###
 lookupAdapter = (ext) ->
   for name, Adapter of accord.all()
-    a = new Adapter
-    if _.contains(a.extensions, ext) then return a.name
+    if _.contains(Adapter::extensions, ext) then return name
   return
 
 ###*
