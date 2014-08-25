@@ -28,14 +28,13 @@ module.exports = cli = new EventEmitter
  * @param  {Object} argv - command line arguments, parsed by minimist
  * @return {Promise} promise for results
 ###
-
 module.exports.run = (argv) ->
   if not argv.compile or argv.help then return cli.emit('data', help())
 
-  locals = get_locals(argv)
+  locals = getLocals(argv)
   filepath = path.resolve(argv.compile)
   ext = path.extname(filepath).substring(1)
-  name = lookup_adapter(ext)
+  name = lookupAdapter(ext)
 
   if not name
     return cli.emit('err', "File extension '#{ext}' not supported".red)
@@ -43,13 +42,13 @@ module.exports.run = (argv) ->
   if not fs.existsSync(filepath)
     return cli.emit('err', "File '#{filepath}' not found ".red)
 
-  adapter = accord.load(name, resolve_path(name))
+  adapter = accord.load(name, resolvePath(name))
 
   run = -> render(adapter, filepath, locals, cli, argv)
   promise = run()
 
   if argv.watch
-    watcher = chokidar.watch(filepath, { persistent:  true })
+    watcher = chokidar.watch(filepath, persistent: true)
     watcher.on('change', run)
     watcher
   else
@@ -58,12 +57,10 @@ module.exports.run = (argv) ->
 ###*
  * Given a file extension, finds the adapter's name in accord, or
  * returns undefined.
- *
  * @param  {String} ext - file extension, no dot
  * @return {?} string adapter name or undefined
 ###
-
-lookup_adapter = (ext) ->
+lookupAdapter = (ext) ->
   for name, Adapter of accord.all()
     a = new Adapter
     if _.contains(a.extensions, ext) then return a.name
@@ -75,8 +72,7 @@ lookup_adapter = (ext) ->
  * @param  {String} name - name of a node module
  * @return {String} path to the module
 ###
-
-resolve_path = (name) ->
+resolvePath = (name) ->
   _path = require.resolve(name).split(path.sep).reverse()
   for p, i in _path
     if _path[i - 1] is name and p is 'node_modules' then break
@@ -89,7 +85,6 @@ resolve_path = (name) ->
  * @param  {Object} argv - arguments object
  * @return {Promise} a promise for the result
 ###
-
 render = (adapter, filepath, locals, cli, argv) ->
   cli.emit('start')
 
@@ -108,8 +103,7 @@ render = (adapter, filepath, locals, cli, argv) ->
  * @param  {Object} argv - args object, parsed my minimist
  * @return {Object} cloned object, pruned of all functional keys
 ###
-
-get_locals = (argv) ->
+getLocals = (argv) ->
   res = _.clone(argv)
   delete res._
   delete res.compile
