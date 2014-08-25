@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "LiveScript": "*",
-    "accord": "0.0.9",
+    "accord": "0.12.x",
     "anti-matter": "0.0.1",
     "chokidar": "0.8.x",
     "clean-css": "*",
