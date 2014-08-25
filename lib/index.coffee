@@ -42,7 +42,7 @@ module.exports.run = (argv) ->
   if not fs.existsSync(filepath)
     return cli.emit('err', "File '#{filepath}' not found ".red)
 
-  adapter = accord.load(name, resolvePath(name))
+  adapter = accord.load(name)
 
   run = -> render(adapter, filepath, locals, cli, argv)
   promise = run()
@@ -64,18 +64,6 @@ lookupAdapter = (ext) ->
   for name, Adapter of accord.all()
     if _.contains(Adapter::extensions, ext) then return name
   return
-
-###*
- * Given the name of a module, returns it's home folder in node
- * modules. This was taken from accord's source.
- * @param  {String} name - name of a node module
- * @return {String} path to the module
-###
-resolvePath = (name) ->
-  _path = require.resolve(name).split(path.sep).reverse()
-  for p, i in _path
-    if _path[i - 1] is name and p is 'node_modules' then break
-  _.first(_path.reverse(), _path.length - i + 1).join(path.sep)
 
 ###*
  * Compile and render the file
