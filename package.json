@@ -1,57 +1,57 @@
 {
   "name": "accord-cli",
+  "description": "compile any language from the command line",
   "version": "0.0.2",
   "author": "Jeff Escalante <jeff@carrotcreative.com>",
-  "description": "compile any language from the command line",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/carrot/accord-cli.git"
-  },
-  "main": "lib",
   "bin": {
     "accord": "./bin/accord"
   },
-  "scripts": {
-    "test": "mocha",
-    "coveralls": "make build; istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage; make unbuild"
+  "dependencies": {
+    "LiveScript": "*",
+    "accord": "0.0.9",
+    "anti-matter": "0.0.1",
+    "chokidar": "0.8.x",
+    "clean-css": "*",
+    "coco": "*",
+    "coffee-script": "1.7.x",
+    "colors": "0.6.x",
+    "csso": "*",
+    "dogescript": "*",
+    "ejs": "*",
+    "hamljs": "*",
+    "handlebars": "*",
+    "hogan.js": "*",
+    "html-minifier": "*",
+    "jade": "*",
+    "less": "*",
+    "lodash": "2.4.x",
+    "marc": "*",
+    "marked": "*",
+    "minimist": "0.0.8",
+    "myth": "*",
+    "node-sass": "*",
+    "stylus": "*",
+    "swig": "*",
+    "uglifyjs": "*"
+  },
+  "devDependencies": {
+    "coveralls": "2.x",
+    "istanbul": "0.2.x",
+    "mocha": "*",
+    "mocha-lcov-reporter": "0.0.1",
+    "should": "*"
   },
   "engines": {
     "node": ">=0.10.0"
   },
-  "dependencies": {
-    "coffee-script": "1.7.x",
-    "minimist": "0.0.8",
-    "lodash": "2.4.x",
-    "accord": "0.0.9",
-    "colors": "0.6.x",
-    "chokidar": "0.8.x",
-    "anti-matter": "0.0.1",
-    "swig": "*",
-    "jade": "*",
-    "ejs": "*",
-    "marked": "*",
-    "marc": "*",
-    "hogan.js": "*",
-    "handlebars": "*",
-    "hamljs": "*",
-    "stylus": "*",
-    "node-sass": "*",
-    "less": "*",
-    "myth": "*",
-    "dogescript": "*",
-    "coco": "*",
-    "LiveScript": "*",
-    "uglifyjs": "*",
-    "clean-css": "*",
-    "html-minifier": "*",
-    "csso": "*"
+  "license": "MIT",
+  "main": "lib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/carrot/accord-cli.git"
   },
-  "devDependencies": {
-    "mocha": "*",
-    "should": "*",
-    "coveralls": "2.x",
-    "mocha-lcov-reporter": "0.0.1",
-    "istanbul": "0.2.x"
+  "scripts": {
+    "test": "mocha",
+    "coveralls": "make build; istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage; make unbuild"
   }
 }
