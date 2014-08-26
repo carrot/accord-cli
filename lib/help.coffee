@@ -11,7 +11,8 @@ module.exports = ->
     }, {
       name: '--out (-o)'
       required: 'filename'
-      description: '[optional] Specify a file to pipe the compiled results.'
+      description: '[optional] Specify a file to pipe the compiled results. For
+      use where regular pipes can\'t be used (like with the --watch arg).'
     }, {
       name: '--watch (-w)'
       description: '[optional] Watch the file for changes and recompile.'

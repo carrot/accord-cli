@@ -14,7 +14,6 @@
     "clean-css": "*",
     "coco": "*",
     "coffee-script": "1.7.x",
-    "colors": "0.6.x",
     "csso": "*",
     "dogescript": "*",
     "ejs": "*",

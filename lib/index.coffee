@@ -1,4 +1,3 @@
-require 'colors'
 fs           = require 'fs'
 path         = require 'path'
 _            = require 'lodash'
@@ -44,7 +43,7 @@ module.exports.run = (argv) ->
 
   adapter = accord.load(name)
 
-  run = -> render(adapter, filepath, locals, cli, argv)
+  run = -> render(adapter, filepath, locals, cli)
   promise = run()
 
   if argv.watch
@@ -69,21 +68,11 @@ lookupAdapter = (ext) ->
  * Compile and render the file
  * @param  {String} filepath - path to the file
  * @param  {EventEmitter} cli - cli emitter
- * @param  {Object} argv - arguments object
- * @return {Promise} a promise for the result
 ###
-render = (adapter, filepath, locals, cli, argv) ->
-  cli.emit('start')
-
-  adapter.renderFile(filepath, locals)
-    .catch(cli.emit.bind(cli, 'err'))
-    .then((o) ->
-      if argv.out
-        fs.writeFileSync(path.resolve(argv.out), o)
-      else
-        cli.emit('data', o)
-    )
-    .then(cli.emit.bind(cli, 'done'))
+render = (adapter, filepath, locals, cli) ->
+  adapter.renderFile(filepath, locals).done((res) ->
+    cli.emit('data', res)
+  )
 
 ###*
  * Remove the functional flags, leaving only the 'locals'.
