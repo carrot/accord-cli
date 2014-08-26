@@ -38,6 +38,7 @@
     "istanbul": "0.2.x",
     "mocha": "*",
     "mocha-lcov-reporter": "0.0.1",
+    "shelljs": "^0.3.0",
     "should": "*"
   },
   "engines": {
