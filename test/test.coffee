@@ -45,13 +45,13 @@ describe 'basic', ->
 
     cli.on('data', listener)
 
-    watcher = cli.run(compile: @file, foo: 'bar', watch: true)
+    watcher = cli.run(compile: @file, watch: true)
 
   it 'should display help when no commands given', (done) ->
     command = "./bin/accord"
     exec(command, silent: true, (code, out) ->
-      out.should.match /Accord CLI/
-      code.should.eql(0) # TODO: this shouldn't actually be 0, no args = error
+      out.should.match /accord \[-h\] \[-v\]/
+      code.should.eql(2)
       done()
     )
 
@@ -61,7 +61,7 @@ describe 'with variable', ->
     @out = path.join(_path, 'var.html')
 
   it 'basic compile should work', (done) ->
-    command = "./bin/accord -c #{@file} --foo 'bar'"
+    command = "./bin/accord -c #{@file} --data '{\"foo\":\"bar\"}'"
     exec(command, silent: true, (code, out) ->
       out.should.eql('<p>bar</p>\n')
       code.should.eql(0)
@@ -70,7 +70,7 @@ describe 'with variable', ->
 
 
   it 'should write to given file path', (done) ->
-    command = "./bin/accord -c #{@file} -o #{@out} --foo 'bar'"
+    command = "./bin/accord -c #{@file} -o #{@out} --data '{\"foo\":\"bar\"}'"
     exec(command, silent: true, (code, out) =>
       out.should.eql('')
       code.should.eql(0)

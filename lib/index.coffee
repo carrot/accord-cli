@@ -4,7 +4,6 @@ _            = require 'lodash'
 accord       = require 'accord'
 EventEmitter = require('events').EventEmitter
 chokidar     = require 'chokidar'
-help         = require './help'
 
 module.exports = cli = new EventEmitter
 
@@ -24,13 +23,12 @@ module.exports = cli = new EventEmitter
  * was a compile error, that's emitted. If not, we either write or log the
  * results.
  *
- * @param  {Object} argv - command line arguments, parsed by minimist
+ * @param  {Object} argv - command line arguments from argparse
  * @return {Promise} promise for results
 ###
 module.exports.run = (argv) ->
   if not argv.compile or argv.help then return cli.emit('data', help())
-
-  locals = getLocals(argv)
+  if argv.data? then locals = JSON.parse(argv.data)
   filepath = path.resolve(argv.compile)
   ext = path.extname(filepath).substring(1)
   name = lookupAdapter(ext)
@@ -68,26 +66,9 @@ lookupAdapter = (ext) ->
  * Compile and render the file
  * @param  {String} filepath - path to the file
  * @param  {EventEmitter} cli - cli emitter
+ * @return {Promise} promise for results
 ###
 render = (adapter, filepath, locals, cli) ->
   adapter.renderFile(filepath, locals).done((res) ->
     cli.emit('data', res)
   )
-
-###*
- * Remove the functional flags, leaving only the 'locals'.
- * @param  {Object} argv - args object, parsed my minimist
- * @return {Object} cloned object, pruned of all functional keys
-###
-getLocals = (argv) ->
-  res = _.clone(argv)
-  delete res._
-  delete res.compile
-  delete res.c
-  delete res.out
-  delete res.o
-  delete res.watch
-  delete res.w
-  delete res.help
-  delete res.h
-  return res

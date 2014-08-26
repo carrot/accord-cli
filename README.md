@@ -31,10 +31,10 @@ To compile to a specific output location, use pipes:
 $ accord -c foo.jade > bar.html
 ```
 
-To compile with options, put in your options as flags as such:
+To compile with data, format your data as JSON and pass it through with the `--data` or `-d` flag:
 
 ```
-$ accord -c foo.jade --name 'doge' --location 'nyc'
+$ accord -c foo.jade --data '{"name":"doge", "location":"nyc"}'
 ```
 
 To watch a file, recompiling it any time it changes, use the `--watch` or `-w` flag:

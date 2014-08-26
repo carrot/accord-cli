@@ -9,7 +9,7 @@
   "dependencies": {
     "LiveScript": "*",
     "accord": "0.12.x",
-    "anti-matter": "0.0.1",
+    "argparse": "^0.1.15",
     "chokidar": "0.8.x",
     "clean-css": "*",
     "coco": "*",
@@ -26,7 +26,6 @@
     "lodash": "2.4.x",
     "marc": "*",
     "marked": "*",
-    "minimist": "0.0.8",
     "myth": "*",
     "node-sass": "*",
     "stylus": "*",
