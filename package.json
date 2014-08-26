@@ -13,7 +13,7 @@
     "chokidar": "0.8.x",
     "clean-css": "*",
     "coco": "*",
-    "coffee-script": "1.7.x",
+    "coffee-script": "1.8.x",
     "csso": "*",
     "dogescript": "*",
     "ejs": "*",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "coveralls": "2.x",
-    "istanbul": "0.2.x",
+    "istanbul": "0.3.x",
     "mocha": "*",
     "mocha-lcov-reporter": "0.0.1",
     "shelljs": "^0.3.0",
