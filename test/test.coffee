@@ -11,15 +11,15 @@ describe 'basic', ->
     @out = path.join(_path, 'basic.html')
 
   it 'basic compile should work', (done) ->
-    command = "./bin/accord -c #{@file}"
+    command = "./bin/accord #{@file}"
     exec(command, silent: true, (code, out) ->
-      out.should.eql('<p>bar</p>\n')
+      out.should.eql('<p>bar</p>')
       code.should.eql(0)
       done()
     )
 
   it 'should write to given file path', (done) ->
-    command = "./bin/accord -c #{@file} -o #{@out}"
+    command = "./bin/accord #{@file} --out #{@out}"
     exec(command, silent: true, (code, out) =>
       out.should.eql('')
       code.should.eql(0)
@@ -45,13 +45,21 @@ describe 'basic', ->
 
     cli.on('data', listener)
 
-    watcher = cli.run(compile: @file, watch: true)
+    watcher = cli.run(file: @file, watch: true)
 
-  it 'should display help when no commands given', (done) ->
-    command = "./bin/accord"
+  it 'should display help with "-h"', (done) ->
+    command = "./bin/accord -h"
     exec(command, silent: true, (code, out) ->
       out.should.match /accord \[-h\] \[-v\]/
-      code.should.eql(2)
+      code.should.eql(0)
+      done()
+    )
+
+  it 'should fail when called without args', (done) ->
+    command = "./bin/accord"
+    exec(command, silent: true, (code, out) ->
+      out.should.match /INFILE and\/or ADAPTER must be specified/
+      code.should.eql(8)
       done()
     )
 
@@ -61,16 +69,16 @@ describe 'with variable', ->
     @out = path.join(_path, 'var.html')
 
   it 'basic compile should work', (done) ->
-    command = "./bin/accord -c #{@file} --data '{\"foo\":\"bar\"}'"
+    command = "./bin/accord #{@file} -o '{\"foo\":\"bar\"}'"
     exec(command, silent: true, (code, out) ->
-      out.should.eql('<p>bar</p>\n')
+      out.should.eql('<p>bar</p>')
       code.should.eql(0)
       done()
     )
 
 
   it 'should write to given file path', (done) ->
-    command = "./bin/accord -c #{@file} -o #{@out} --data '{\"foo\":\"bar\"}'"
+    command = "./bin/accord #{@file} --out #{@out} -o '{\"foo\":\"bar\"}'"
     exec(command, silent: true, (code, out) =>
       out.should.eql('')
       code.should.eql(0)

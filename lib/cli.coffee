@@ -2,7 +2,6 @@ path = require 'path'
 packageInfo = require(path.join(__dirname, '../package.json'))
 ArgumentParser = require('argparse').ArgumentParser
 fs = require 'fs'
-path = require 'path'
 cli = require './'
 
 argparser = new ArgumentParser(
@@ -11,14 +10,21 @@ argparser = new ArgumentParser(
   description: packageInfo.description
 )
 argparser.addArgument(
-  ['--compile', '-c']
+  ['file']
+  nargs: '?'
   type: 'string'
   metavar: 'INFILE'
-  help: 'The file to compile'
-  required: true
+  help: 'The file to compile. If omitted, accord will read from STDIN.'
 )
 argparser.addArgument(
-  ['--out', '-o']
+  ['--adapter']
+  type: 'string'
+  help: 'The accord adapter to use for compiling the file. If omitted, this will
+  be deduced from the INFILE\'s extension. If INFILE is omitted and the input is
+  passed via STDIN, then this is required.'
+)
+argparser.addArgument(
+  ['--out']
   type: 'string'
   metavar: 'OUTFILE'
   help: 'Specify a file to pipe the compiled results. For use where regular
@@ -27,21 +33,25 @@ argparser.addArgument(
 argparser.addArgument(
   ['--watch', '-w']
   action: 'storeTrue'
-  help: 'Watch the file for changes and recompile'
+  help: 'Watch the file for changes and recompile. INFILE must be specified to
+  use this'
 )
 argparser.addArgument(
-  ['--data', '-d']
+  ['--options', '-o']
   type: 'string'
   defaultValue: '{}'
-  help: 'Data to be passed to the compiler, formatted as a string of JSON'
+  help: 'Options to be passed to the compiler, formatted as a string of JSON'
 )
 argv = argparser.parseArgs()
+
+# pass options as an object rather than a string
+argv.options = JSON.parse(argv.options)
 
 cli.on('data', (data) ->
   if argv.out
     fs.writeFileSync(path.resolve(argv.out), data)
   else
-    console.log(data)
+    process.stdout.write(data)
 )
 cli.on('err', console.error.bind(console))
 cli.run(argv)

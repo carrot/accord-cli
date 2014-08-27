@@ -27,33 +27,62 @@ module.exports = cli = new EventEmitter
  * @return {Promise} promise for results
 ###
 module.exports.run = (argv) ->
-  if not argv.compile or argv.help then return cli.emit('data', help())
-  if argv.data? then locals = JSON.parse(argv.data)
-  filepath = path.resolve(argv.compile)
-  ext = path.extname(filepath).substring(1)
-  name = lookupAdapter(ext)
+  argv.options ?= {}
 
-  if not name
-    return cli.emit('err', "File extension '#{ext}' not supported".red)
+  if argv.watch and not argv.file?
+    throw new Error("INFILE must be specified to use watch")
 
-  if not fs.existsSync(filepath)
-    return cli.emit('err', "File '#{filepath}' not found ".red)
+  if argv.file?
+    filepath = path.resolve(argv.file)
+    if not fs.existsSync(filepath)
+      throw new Error("File '#{filepath}' not found")
 
-  adapter = accord.load(name)
-
-  run = -> render(adapter, filepath, locals, cli)
-  promise = run()
-
-  if argv.watch
-    watcher = chokidar.watch(filepath, persistent: true)
-    watcher.on('change', run)
-    watcher
+    ext = path.extname(filepath).substring(1)
+    name = lookupAdapter(ext)
+    if not name
+      throw new Error("File extension '#{ext}' not supported")
+  else if argv.adapter?
+    name = argv.adapter
   else
-    promise
+    throw new Error("INFILE and/or ADAPTER must be specified")
+
+  try
+    adapter = accord.load(name)
+  catch e
+    throw new Error("Adapter '#{name}' is not supported")
+
+  if filepath?
+    run = ->
+      adapter.renderFile(filepath, argv.options).done((res) ->
+        cli.emit('data', res)
+      )
+
+    promise = run()
+
+    if argv.watch
+      watcher = chokidar.watch(filepath, persistent: true)
+      watcher.on('change', run)
+      watcher
+    else
+      promise
+  else
+    process.stdin.setEncoding 'utf8'
+    process.stdin.on 'readable', ->
+      buffer = ''
+      buffer += chunk while (chunk = process.stdin.read()) isnt null
+
+      #FIXME: I'm not sure why, but stdin is becoming readable more than once
+      if buffer is '' then return
+
+      adapter
+        .render(buffer, argv.options)
+        .done((res) ->
+          cli.emit('data', res)
+        )
 
 ###*
- * Given a file extension, finds the adapter's name in accord, or
- * returns undefined.
+ * Given a file extension, finds the adapter's name in accord, or returns
+ * undefined.
  * @param  {String} ext - file extension, no dot
  * @return {String|undefined} string adapter name or undefined
 ###
@@ -61,14 +90,3 @@ lookupAdapter = (ext) ->
   for name, Adapter of accord.all()
     if _.contains(Adapter::extensions, ext) then return name
   return
-
-###*
- * Compile and render the file
- * @param  {String} filepath - path to the file
- * @param  {EventEmitter} cli - cli emitter
- * @return {Promise} promise for results
-###
-render = (adapter, filepath, locals, cli) ->
-  adapter.renderFile(filepath, locals).done((res) ->
-    cli.emit('data', res)
-  )
