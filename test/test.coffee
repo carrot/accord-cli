@@ -76,7 +76,6 @@ describe 'with variable', ->
       done()
     )
 
-
   it 'should write to given file path', (done) ->
     command = "./bin/accord #{@file} --out #{@out} -o '{\"foo\":\"bar\"}'"
     exec(command, silent: true, (code, out) =>

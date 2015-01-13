@@ -50,7 +50,7 @@
     "url": "https://github.com/carrot/accord-cli.git"
   },
   "scripts": {
-    "test": "mocha",
-    "coveralls": "make build; istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage; make unbuild"
+    "coveralls": "make build; istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage; make unbuild",
+    "test": "mocha"
   }
 }
