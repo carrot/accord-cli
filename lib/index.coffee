@@ -1,11 +1,9 @@
-require 'colors'
 fs           = require 'fs'
 path         = require 'path'
 _            = require 'lodash'
 accord       = require 'accord'
 EventEmitter = require('events').EventEmitter
 chokidar     = require 'chokidar'
-help         = require './help'
 
 module.exports = cli = new EventEmitter
 
@@ -24,100 +22,72 @@ module.exports = cli = new EventEmitter
  * After this, we grab the adapter and try to compile the file. If there
  * was a compile error, that's emitted. If not, we either write or log the
  * results.
- * 
- * @param  {Object} argv - command line arguments, parsed by minimist
+ *
+ * @param  {Object} argv - command line arguments from argparse
  * @return {Promise} promise for results
 ###
-
 module.exports.run = (argv) ->
-  if not argv.compile or argv.help then return cli.emit('data', help())
+  argv.options ?= {}
 
-  locals = get_locals(argv)
-  filepath = path.resolve(argv.compile)
-  ext = path.extname(filepath).substring(1)
-  name = lookup_adapter(ext)
+  if argv.watch and not argv.file?
+    throw new Error("INFILE must be specified to use watch")
 
-  if not name
-    return cli.emit('err', "File extension '#{ext}' not supported".red)
-  
-  if not fs.existsSync(filepath)
-    return cli.emit('err', "File '#{filepath}' not found ".red)
+  if argv.file?
+    filepath = path.resolve(argv.file)
+    if not fs.existsSync(filepath)
+      throw new Error("File '#{filepath}' not found")
 
-  adapter = accord.load(name, resolve_path(name))
-
-  run = -> render(adapter, filepath, locals, cli, argv)
-  promise = run()
-
-  if argv.watch
-    watcher = chokidar.watch(filepath, { persistent:  true })
-    watcher.on('change', run)
-    watcher
+    ext = path.extname(filepath).substring(1)
+    name = lookupAdapter(ext)
+    if not name
+      throw new Error("File extension '#{ext}' could not be matched to an
+      adapter. Specify an adapter manually with --adapter")
+  else if argv.adapter?
+    name = argv.adapter
   else
-    promise
+    throw new Error("INFILE and/or ADAPTER must be specified")
+
+  try
+    adapter = accord.load(name)
+  catch e
+    throw new Error("Adapter '#{name}' is not supported")
+
+  if filepath?
+    run = ->
+      adapter.renderFile(filepath, argv.options).done((res) ->
+        cli.emit('data', res)
+      )
+
+    promise = run()
+
+    if argv.watch
+      watcher = chokidar.watch(filepath, persistent: true)
+      watcher.on('change', run)
+      watcher
+    else
+      promise
+  else
+    process.stdin.setEncoding 'utf8'
+    process.stdin.on 'readable', ->
+      buffer = ''
+      buffer += chunk while (chunk = process.stdin.read()) isnt null
+
+      #FIXME: I'm not sure why, but stdin is becoming readable more than once
+      if buffer is '' then return
+
+      adapter
+        .render(buffer, argv.options)
+        .done((res) ->
+          cli.emit('data', res)
+        )
 
 ###*
- * Given a file extension, finds the adapter's name in accord, or
- * returns undefined.
- * 
+ * Given a file extension, finds the adapter's name in accord, or returns
+ * undefined.
  * @param  {String} ext - file extension, no dot
- * @return {?} string adapter name or undefined
+ * @return {String|undefined} string adapter name or undefined
 ###
-
-lookup_adapter = (ext) ->
+lookupAdapter = (ext) ->
   for name, Adapter of accord.all()
-    a = new Adapter
-    if _.contains(a.extensions, ext) then return a.name
+    if _.contains(Adapter::extensions, ext) then return name
   return
-
-###*
- * Given the name of a module, returns it's home folder in node
- * modules. This was taken from accord's source.
- * @param  {String} name - name of a node module
- * @return {String} path to the module
-###
-
-resolve_path = (name) ->
-  _path = require.resolve(name).split(path.sep).reverse()
-  for p, i in _path
-    if _path[i - 1] is name and p is 'node_modules' then break
-  _.first(_path.reverse(), _path.length - i + 1).join(path.sep)
-
-###*
- * Compile and render the file
- * @param  {String} filepath - path to the file
- * @param  {EventEmitter} cli - cli emitter
- * @param  {Object} argv - arguments object
- * @return {Promise} a promise for the result
-###
-
-render = (adapter, filepath, locals, cli, argv) ->
-  cli.emit('start')
-
-  adapter.renderFile(filepath, locals)
-    .catch(cli.emit.bind(cli, 'err'))
-    .then((o) ->
-      if argv.out
-        fs.writeFileSync(path.resolve(argv.out), o)
-      else
-        cli.emit('data', o)
-    )
-    .then(cli.emit.bind(cli, 'done'))
-
-###*
- * Remove the functional flags, leaving only the 'locals'.
- * @param  {Object} argv - args object, parsed my minimist
- * @return {Object} cloned object, pruned of all functional keys
-###
-
-get_locals = (argv) ->
-  res = _.clone(argv)
-  delete res._
-  delete res.compile
-  delete res.c
-  delete res.out
-  delete res.o
-  delete res.watch
-  delete res.w
-  delete res.help
-  delete res.h
-  return res

@@ -1,59 +1,52 @@
-Accord CLI
-==========
-
+# Accord CLI
 [![npm](https://badge.fury.io/js/accord-cli.png)](http://badge.fury.io/js/accord-cli)  [![dependencies](https://david-dm.org/carrot/accord-cli.png?theme=shields.io)](https://david-dm.org/carrot/accord-cli) [![tests](https://travis-ci.org/carrot/accord-cli.png?branch=master)](https://travis-ci.org/carrot/accord-cli) [![Coverage Status](https://coveralls.io/repos/carrot/accord-cli/badge.png)](https://coveralls.io/r/carrot/accord-cli)
 
 Compile any language from the command line
 
 > **Note:** This project is in early development, and versioning is a little different. [Read this](http://markup.im/#q4_cRZ1Q) for more details.
 
-### Why should you care?
+## Why should you care?
+Based on a careful analysis of your location, the time of day, and the force with which you have been hitting keys on your keyboard, we have determined with 98% confidence that you might have been recently thinking, _"Man, I really wish I could compile any js-based language via the command line just to quickly see the output"_. Well, you're in luck, that's pretty much exactly what Accord CLI will do for you.
 
-Based on a careful analysis of your location, the time of day, and the force with which you have been hitting keys on your keyboard, we have determined with 98% confidence that you might have been recently thinking, _"Man, I really wish I could compile any js-based language via the command line just to quickly see the output"_. Well, you're in luck, that's pretty much exactly what accord cli will do for you.
+[Accord](https://github.com/jenius/accord) is a unified interface to a bunch of different compiled languages that you might be using as a part of your web stack. By ensuring that the interfaces are consistent, you can use any language that accord supports in the same way, without having to wade through pages of API docs to figure out how their public API works. Most importantly, you can switch between two different languages with minimal pain. While accord is built for programmatic use, this project exposes a nice clean CLI so you can compile and watch from your command line. Whoo!
 
-[Accord](https://github.com/jenius/accord) is a unified interface to a bunch of different compiled languages that you might be using as a part of your web stack. By ensuring that the interfaces are consistent, you can use any language that accord supports in the same way, without having to wade through pages of API docs to figure out how it's public API works. Most importantly, you can switch between two different languages with minimal pain. While accord is built for programmatic use, this project exposes a nice clean CLI interface so you can compile and watch from your command line. Whoo!
-
-### Installation
+## Installation
 
 ```
 npm install accord-cli -g
 ```
 
-...and make sure you also have whatever language(s) you want to compile installed globally as well. For example, if you were using jade, it would be:
+This will also include all the languages that accord supports, so you don't need to install them manually.
 
-```
-$ npm install jade -g
-```
-
-### Usage
-
-To compile, just pass the filename with the `--compile` or `-c` flag:
+## Usage
+To compile, pass the filename with the `--compile` or `-c` flag:
 
 ```
 $ accord -c foo.jade
 ```
 
-To compile to a specific output location, use the `--out` or `-o` flag:
+To compile to a specific output location, use pipes:
 
 ```
-$ accord -c foo.jade -o bar.html
+$ accord -c foo.jade > bar.html
 ```
 
-To compile with options, just put in your options as flags as such:
+To compile with data, format your data as JSON and pass it through with the `--data` or `-d` flag:
 
 ```
-$ accord -c foo.jade --name 'doge' --location 'nyc'
+$ accord -c foo.jade --data '{"name":"doge", "location":"nyc"}'
 ```
 
 To watch a file, recompiling it any time it changes, use the `--watch` or `-w` flag:
 
 ```
-$ accord -w foo.jade
+$ accord -c foo.jade --watch
 ```
 
-And if you want to compile multiple files with potentially different extensions like you would for a full web build, just use [roots](http://roots.cx) ya dumbo! For all usage options, just run `accord` or `accord --help`
+To watch a file, recompiling it to a specific output location, use the `--out` or `-o` flag (ensuring that the file is overwriten each time a recompilation is done, rather than appended to, like with pipes)
 
-### License & Contributing
+```
+$ accord -c foo.jade --watch -o foo.html
+```
 
-- Details on the license [can be found here](LICENSE.md)
-- Details on running tests and contributing [can be found here](contributing.md)
+And if you want to compile multiple files with potentially different extensions like you would for a full web build, use [roots](http://roots.cx)! For all usage options, run `accord` or `accord --help`
