@@ -40,7 +40,8 @@ module.exports.run = (argv) ->
     ext = path.extname(filepath).substring(1)
     name = lookupAdapter(ext)
     if not name
-      throw new Error("File extension '#{ext}' not supported")
+      throw new Error("File extension '#{ext}' could not be matched to an
+      adapter. Specify an adapter manually with --adapter")
   else if argv.adapter?
     name = argv.adapter
   else
